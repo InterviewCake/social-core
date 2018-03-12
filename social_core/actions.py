@@ -1,7 +1,8 @@
 from six.moves.urllib_parse import quote
 
 from .utils import sanitize_redirect, user_is_authenticated, \
-                   user_is_active, partial_pipeline_data, setting_url
+                   user_is_active, partial_pipeline_data, setting_url \
+                   user_is_anonymous
 
 
 def do_auth(backend, redirect_name='next'):
@@ -29,10 +30,17 @@ def do_auth(backend, redirect_name='next'):
 
 def do_complete(backend, login, user=None, redirect_name='next',
                 *args, **kwargs):
+    anonymous_user = None
     data = backend.strategy.request_data()
 
+    # check if the user is anonymous
+    # if so, put her aside to go in the pipeline as anonymous_user
+    # and set user to none
     is_authenticated = user_is_authenticated(user)
-    user = user if is_authenticated else None
+    is_anonymous = user_is_anonymous(user)
+    if is_anonymous:
+        anonymous_user = user
+        user = None
 
     partial = partial_pipeline_data(backend, user, *args, **kwargs)
     if partial:
