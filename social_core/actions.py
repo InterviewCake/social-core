@@ -1,7 +1,7 @@
 from six.moves.urllib_parse import quote
 
 from .utils import sanitize_redirect, user_is_authenticated, \
-                   user_is_active, partial_pipeline_data, setting_url \
+                   user_is_active, partial_pipeline_data, setting_url, \
                    user_is_anonymous
 
 
@@ -44,11 +44,11 @@ def do_complete(backend, login, user=None, redirect_name='next',
 
     partial = partial_pipeline_data(backend, user, *args, **kwargs)
     if partial:
-        user = backend.continue_pipeline(partial)
+        user = backend.continue_pipeline(partial, anonymous_user=anonymous_user)
         # clean partial data after usage
         backend.strategy.clean_partial_pipeline(partial.token)
     else:
-        user = backend.complete(user=user, *args, **kwargs)
+        user = backend.complete(user=user, anonymous_user=anonymous_user, *args, **kwargs)
 
     # pop redirect value before the session is trashed on login(), but after
     # the pipeline so that the pipeline can change the redirect if needed

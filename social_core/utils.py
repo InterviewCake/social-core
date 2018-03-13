@@ -104,12 +104,21 @@ def sanitize_redirect(hosts, redirect_to):
                 return redirect_to
 
 
+def built_in_user_is_authenticated(user):
+    return (user
+        and hasattr(user, 'is_authenticated')
+        and isinstance(user.is_authenticated, collections.Callable)
+        and user.is_authenticated()
+        and hasattr(user, 'profile')
+        and user.profile)
+
+
 def user_is_authenticated(user):
-    return user and user.is_authenticated() and user.profile and not user.profile.is_anonymous
+    return built_in_user_is_authenticated(user) and (not user.profile.is_anonymous)
 
 
 def user_is_anonymous(user):
-    return user and user.is_authenticated() and user.profile and user.profile.is_anonymous
+    return built_in_user_is_authenticated(user) and user.profile.is_anonymous
 
 
 def user_is_active(user):
