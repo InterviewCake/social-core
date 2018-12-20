@@ -112,7 +112,7 @@ def sanitize_redirect(hosts, redirect_to):
 def built_in_user_is_authenticated(user):
     return (user
         and hasattr(user, 'is_authenticated')
-        and user.is_authenticated()
+        and user.is_authenticated
         and hasattr(user, 'profile')
         and user.profile)
 
